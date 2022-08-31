@@ -1,0 +1,19 @@
+{% extends 'main/base.html' %}
+
+{% block proba %}
+
+
+
+
+
+   <form action="" method="post">
+    {% csrf_token %}
+    {{ aform.as_p }}
+    <input type="submit" name="{{aform.prefix}}" value="Submit" />{{aform.prefix}}
+    {{ bform.as_p }}
+    <input type="submit" name="{{bform.prefix}}" value="Submit" />
+</form>
+
+{% endblock %}
+
+

@@ -1,0 +1,27 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+     <hr class="mt-6 mb-2">
+    <title>РЕДАКТИРОВАНИЕ</title>
+<ul class="nav nav-pills nav-justified">
+  <li class="nav-item">
+<a class="nav-link active" aria-current="page" href="{% url 'index' %}">ГЛАВНАЯ  </a>
+  </li>
+</ul>
+     <hr class="mt-6 mb-2">
+    <h3>Редактировать запись об отпуске</h3>
+     <hr class="mt-6 mb-2">
+<form method="POST" actions="/editOtpusk/" enctype="multipart/form-data">
+    {% csrf_token %}
+    <img src="/media/{{ photo }}" hieght="200" width="150">
+    <h2>{{ people.name }} {{ people.familia }} </h2>
+<table class="form-control">
+
+   {{ form.as_table }}
+
+</table>
+
+    <input type="submit" value="Сохранить">
+
+    </form>
+{% endblock %}

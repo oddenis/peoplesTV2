@@ -1,0 +1,41 @@
+{% extends 'main/base.html' %}
+
+
+    <title>Поиск сотрудника</title>
+{% block content %}
+
+    <ul class="nav nav-pills nav-justified">
+        <li class="nav-item"> <a class="nav-link active" aria-current="page" href="{% url 'index' %}">ГЛАВНАЯ</a></li></ul>
+
+    <hr class="mt-6 mb-2">
+    <h3>Укажи фамилию и имя сотрудника</h3>
+    <hr class="mt-0 mb-2"><br>
+
+    {% if flag == '0' %}
+    <form method="POST" actions="/search/" enctype="multipart/form-data">
+    {% csrf_token %}
+<table>
+
+   {{ searchform }}
+</table>
+
+    <input type="submit" value="Найти">
+    </form>
+{% endif %}
+
+{% if flag == '1' %}
+<table>
+<form method="GET" actions="/preview/">
+
+    {% for item in cartochka %}
+
+        <input type="radio" name="preview" value="{{ item.id }}">
+
+
+        {{ item.familia }} {{ item.name }} - {{ item.dolzhnost }} <img src="/media/{{ item.photo }}" height="150" ><br>
+    {% endfor %}
+<input type="submit" value="Отправить">
+</form>
+</table>
+{% endif %}
+{% endblock %}

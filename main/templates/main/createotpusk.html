@@ -1,0 +1,75 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/stylesheet_new.css'%}" type="text/css">
+
+    <title>Делаем отпуска</title>
+
+{% block content %}
+<ul class="nav nav-pills nav-justified">
+    <li class="nav-item"><a class="nav-link active" aria-current="page" href="{% url 'index' %}">ГЛАВНАЯ</a></li></ul>
+<hr class="mt-6 mb-2">
+    <h3>Создать отпуск сотруднику</h3>
+    <hr>
+    <table align="center">
+    <tr>
+    <td style="width: 100">
+
+
+        <h2>{{ id_people.name }} {{ id_people.familia }}</h2>
+
+<img src="/media/{{ id_people.photo }}" hieght="100" width="75">
+  </td>
+        <td> <form method="POST" id='formCreateOtpusk' actions="/createotpusk/" enctype="multipart/form-data" >
+        {% csrf_token %}
+
+
+
+        <caption>Создай отпуск</caption>
+     <tr><td>{{ otpuskform.as_p }}</td>
+    </tr>
+        <button class="b_submit" type="submit" name="aform_pre" value="create_otpusk">Создать отпуск</button>
+
+     </form>
+         <br>
+        </td>
+</tr>
+</table>
+<br>
+<h2>{{ message }}</h2>
+    <div class="col-1" style="text-align: center; ">
+     <span style="font-size: 16px">{{ today|date:"F" }}</span>
+ </div>
+
+<div style="width: 1300px; ">
+    {% for name, calkey in Kalendar.items %}
+    <div class="row" style="height: 25px;">
+        <div class="col-1" style="text-align: center; height: 60px; border: 2px  solid grey; background: aqua;  font-weight: bold ">
+            <a href="preview/{{ name.id }}" style="font-size: 13px; color: black">{{ name }} </a>
+        </div>
+        {% for day, color_key in calkey.items %}
+            {% if color_key == 'lightgreen' or color_key == 'red'  %}
+                <div class="col-sm" style="text-align: center;  border: 2px  solid dimgrey; background: {{ color_key }}">
+                <span style="font-size: 11px; position: relative; top: 1px; left: 1px;"> {{ day }}</span>
+                </div>
+            {% else %}
+
+                <div class="col-sm" style="text-align: center;  border: 2px  solid dimgrey; background: {% for color in color_key.keys %}{{ color }}{% endfor %}">
+                <span style="font-size: 11px; position: relative; top: 1px; left: 1px;"> {{ day }} </span>
+                <span title="О-Очередной Б-Больничный Х-без оплаты" style="font-size: 11px; font-weight: bold; position: relative; top: 1px;"> {% for type in color_key.values %}{{ type }}{% endfor %}</span>
+            </div>
+            {% endif %}
+        {% endfor %}
+
+
+        </div>
+        <br>
+    {% endfor %}
+</div>
+    <br>
+<form method="POST" id='formCrossOtpusk' actions="/createotpusk/" enctype="multipart/form-data" >
+        {% csrf_token %}
+{{ crossform.as_p }}
+<button class="b_submit" type="submit" name="crossform" value="create_otpusk">Добавить сотрудника, с кем нельзя идти в отпуск вместе</button>
+</form>
+{% endblock %}

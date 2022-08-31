@@ -1,0 +1,24 @@
+{% extends 'main/base.html' %}
+    <title>Делаем сотрудников</title>
+
+{% block content %}
+    <hr class="mt-6 mb-2">
+<ul class="nav nav-pills nav-justified">
+    <li class="nav-item" ><a class="nav-link active" aria-current="page" href="{% url 'index' %}">ГЛАВНАЯ</a></li></ul>
+    <hr class="mt-6 mb-2">
+    <h3>Новый сотрудник</h3>
+    <hr class="mt-6 mb-2">
+<form method="POST" actions="/createcard/" enctype="multipart/form-data">
+    {% csrf_token %}
+<table class="form-control">
+   {{ form }}
+</table>
+ <!--   <table>
+        {{ otpform.title_otpusk }}
+        {{ otpform.nachOtpusk }}
+        {{ otpform.kolvoDney }}
+
+    </table>     --!>
+    <input type="submit" value="Создать">
+    </form>
+{% endblock %}

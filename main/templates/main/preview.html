@@ -1,0 +1,137 @@
+
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/stylesheet_new.css'%}" type="text/css">
+
+<title>просмотр карточки</title>
+{% block content %}
+    <style type="text/css">
+    table {
+   width: 100%;
+}
+        .d {
+    display: block;
+    text-align: center;
+   }
+  </style>
+<br>
+<ul class="nav nav-pills nav-justified">
+   <li class="nav-item"> <a class="nav-link active" aria-current="page" href="{% url 'index' %}">ГЛАВНАЯ  </a></li>
+    <li class="nav-item"> <a class="nav-link active" aria-current="page" href="{% url 'createotpusk' id_otpusknik %}">СОЗДАТЬ ОТПУСК  </a></li>
+
+    <li class="nav-item"> <a class="nav-link active" aria-current="page" href="{% url 'edit' id_otpusknik %}">ИЗМЕНИТЬ ДАННЫЕ СОТРУДНИКА  </a></li>
+    <li class="nav-item"> <a class="nav-link active" aria-current="page" href="{% url 'del' id_otpusknik %}">УДАЛИТЬ СОТРУДНИКА  </a> </li>
+</ul>
+    <hr class="mt-6 mb-0">
+    <img src="/media/{{ cartochka.photo }}" hieght="200" width="150" class="rounded float-end">
+<h3>{{ cartochka.familia }} {{ cartochka.name }} {{ cartochka.sename }}</h3>
+<h4>{{ cartochka.dolzhnost }}</h4>
+<hr>
+<div>
+    <p class="fw-bolder"><span class="fst-italic fw-normal">Пол:</span>  {{ cartochka.female }}</p>
+    <p class="fw-bold"><span class="fst-italic fw-normal">Дата рождения:</span>  {{ cartochka.dateOfBirth | date:"d.m.Y" }}</p>
+    <p class="fw-bold"><span class="fst-italic fw-normal">Работает с:</span> {{ cartochka.dateStartWork }}</p>
+    <p class="fw-bold"><span class="fst-italic fw-normal">Отдел:</span> {{ cartochka.otdel_people }}</p>
+    <p class="fw-bold"><span class="fst-italic fw-normal">Программа:</span> |{% for p in cartochka.programma.values  %} {{ p.name_programm }} | {% endfor %}</p>
+    <p class="fw-bold"><span class="fst-italic fw-normal">Карточка создана: </span> {{ cartochka.create_at }}</p>
+</div>
+<hr class="mt-6 mb-2">
+<h4>Отпуска</h4>
+    <hr class="mt-6 mb-2">
+
+
+{% for i in otpusk %}
+    <table style="width:1000px">
+    <tr>
+        <td><span class="fst-italic fw-normal" style="font-size: 20px; position: inherit">Тип отпуска: </span> <span class="fw-bold" style="font-size: 20px; position: inherit">{{ i.title_otpusk }}</span></td>
+        <td><a href="{% url 'editOtpusk' i.id i.title_otpusk %}">Редактировать</a></td>
+        <td><a href="{% url 'delOtpusk' i.id %}"> Удалить отпуск</a> </td>
+        <td style="width:100px"><a href="{% url 'watchfoto' i.id i.person_id %}" ><img src="/media/{{ i.zayvlenie }}" hieght="150" width="100" ></a></td>
+        <td style="padding-left: 30px"><a href="">Посмотреть график</a></td>
+    </tr>
+    <tr>
+        <td>Начало отпуска: {{ i.nachOtpusk }}</td>
+    </tr>
+    <tr>
+        <td>Кол-во дней: {{ i.kolvoDney }}</td>
+    </tr>
+    <tr>
+        <td>Выход на работу: {{ i.konecOtpusk }}</td>
+    </tr>
+ <br>
+</table>
+<form method="POST" id='formCrossOtpusk' actions="/createotpusk/" enctype="multipart/form-data" >
+        {% csrf_token %}
+{{ crossform.as_p }}
+
+        <button class="b_submit" type="submit" name="" value="create_otpusk">Добавить сотрудника, с кем нельзя идти в отпуск вместе</button>
+</form>
+{% endfor %}
+
+ <br>
+
+<hr class="mt-6 mb-2">
+<h4>Табель сотрудника</h4>
+    <hr class="mt-6 mb-2">
+
+
+{% with date_month=view_date|date:"m" %}
+{% with date_year=view_date|date:"Y" %}
+    <form method="POST" actions="tabel" enctype="multipart/form-data">
+    {% csrf_token %}
+        {{formEnterDate}}
+ <button type="submit" value="Сохранить">OK</button>
+       </form>
+<table>
+
+   <tr>
+
+
+    {% for day in daymonth %}
+        {% if day in weekend %}
+            <th style="text-align: center; border: 2px  solid dimgrey; width: 30px; background: red">
+        {% else %}
+            <th style="text-align: center; border: 2px  solid dimgrey; width: 30px; background: lightblue">
+        {% endif %}
+     <span style="font-size: 11px"> {{ day }}</span>
+       </th>
+     {% endfor %}
+   <th class="tabel-th1">рабдней</th>
+   <th class="tabel-th1">часов</th>
+   </tr>
+
+    {% for all_dict in tabeldata %}
+
+        <tr>
+
+            {% for each_dict_k, each_dict_v in all_dict.items %}
+
+            {% for date_day, data_work in each_dict_v.items %}
+                {% for data_work_id,data_work_val in data_work.items %}
+                    {% if data_work_val == 'О' or data_work_val == 'Б' or data_work_val == 'П' or data_work_val == 'Х' %}
+                        <td><a style="text-decoration: none; text-align: center" title="О-Очередной Б-Больничный Х-без оплаты П-прогул" href="{% url 'editOtpusk' data_work_id data_work_val   %}" >{{ data_work_val }}</a></td>
+                    {% else %}
+                        <td><a style="text-decoration: none;text-align: center" title="О-Очередной Б-Больничный Х-без оплаты П-прогул" href="{% url 'tabeledit' all_dict.id data_work_val date_day date_month date_year  %}" >{{ data_work_val }}</a></td>
+                    {% endif %}
+
+
+                {% endfor %}
+
+            {% endfor %}
+
+            {% endfor %}
+        <td></td>
+<td>{{ all_dict.chasi_sum }}</td>
+        </tr>
+
+{% endfor %}
+{% endwith %}
+{% endwith %}
+    </table>
+
+{% endblock %}
+{% block proba %}
+
+{% endblock %}
+
+
+  <p class="fw-bold"> <span class="fst-italic fw-normal">

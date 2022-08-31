@@ -1,0 +1,11 @@
+{% extends 'main/base.html' %}
+
+
+{% block content %}
+    <ul class="nav nav-pills nav-justified">
+   <li class="nav-item"> <a class="nav-link active" aria-current="page" href="{% url 'index' %}">ГЛАВНАЯ  </a></li>
+    <li class="nav-item"> <a class="nav-link active" aria-current="page" href="{% url 'editOtpusk' otpusk.id otpusk.title_otpusk %}">РЕДАКТИРОВАТЬ  </a></li>
+    </ul>
+    <img src="/media/{{ otpusk.zayvlenie }}" hieght="1000px" width="800"style="">
+
+{% endblock %}

@@ -1,0 +1,45 @@
+table {
+        border: 2px solid;
+        border-collapse: collapse;
+        empty-cells: hide;
+    }
+
+td {
+        border: 1px solid;
+        text-align: center;
+        width: 20px;
+    }
+th {
+      border: 1px solid;
+      text-align: center;
+        width: 20px;
+    }
+
+.tabel-th{
+        width: 150px;
+
+
+    }
+.tabel-th1{
+        width: 40px;
+        padding-left: 50px;
+    }
+.td_workday {
+        border: 2px solid;
+        text-align: center;
+
+
+    }
+.th_workday {
+        border: 2px solid;
+        text-align: center;
+
+        padding: 10px;
+    }
+.b_submit{
+    position: relative;
+    top: 250px;
+    left: 100px;
+    font-weight:bold;
+
+}

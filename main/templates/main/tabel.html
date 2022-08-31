@@ -1,0 +1,105 @@
+
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/stylesheet_new.css'%}" type="text/css">
+
+
+
+{% block content %}
+      <title>{{ tabel }}</title>
+    <h1 class="mt-3 justify-content-center">{{ tabel }}</h1>
+    <ul class="nav nav-pills nav-justified">
+   <li class="nav-item"> <a class="nav-link active" aria-current="page" href="{% url 'index' %}">ГЛАВНАЯ  </a></li>
+    </ul>
+
+
+
+<br>
+<br>
+<h3>Сегодня: {% now "d/m" %}</h3>
+    <br>
+    <h3>{{ proba }}</h3>
+    <form method="POST" id="CreateTabelNewDay_form" actions="tabel" enctype="multipart/form-data">
+    {% csrf_token %}
+{{ createTabelDay }}
+    <button type="submit"  name="{{ createTabelDay.prefix }}" form="CreateTabelNewDay_form" value="createTabelNewDay">СОЗДАТЬ РАБОЧИЙ ДЕНЬ</button>
+       </form>
+
+
+{% with date_day_today=view_date|date:"d" %}
+{% with date_month=view_date|date:"m" %}
+{% with date_year=view_date|date:"Y" %}
+
+
+<table>
+     <caption>Табель производственного отдела. {{ view_date|date:"M"}}, {{ view_date|date:"Y"  }}г.</caption>
+   <tr>
+    <th class="tabel-th">ФИО</th>
+    <th class="tabel-th">должность</th>
+    {% for day in daymonth %}
+        {% if day in weekend %}
+            <th style="text-align: center; border: 2px  solid dimgrey; background: red">
+        {% else %}
+            <th style="text-align: center; border: 2px  solid dimgrey; background: lightblue">
+        {% endif %}
+     <span style="font-size: 11px"> {{ day }}</span>
+       </th>
+     {% endfor %}
+   <th class="th_workday" >рабочих<br>дней</th>
+   <th class="th_workday">всего<br>часов</th>
+   </tr>
+
+    {% for all_dict in tabeldata %}
+        <tr>
+            <td><a style="text-decoration: none; " href="{% url 'preview' all_dict.id  %}"> {{all_dict.familia}} {{all_dict.name}}</a></td>
+<td>{{all_dict.dolzhnost}}</td>
+
+{#         {% with iiii=forloop.counter0 %}  #}
+{#             {{ iiii }}  #}
+{#         {% endwith %}  #}
+{{ day_dict.13 }}
+
+
+            {% for each_dict_k, each_dict_v in all_dict.items %}
+
+            {% for date_day, data_work in each_dict_v.items %}
+                {% for data_work_id,data_work_val in data_work.items %}
+                    {% if data_work_val == 'О' or data_work_val == 'Б' or data_work_val == 'П' or data_work_val == 'Х' %}
+                        <td>{{ data_work_val }}</td>
+                    {% elif data_work_val == ' ' and date_day > date_day_today %}
+                        <td>_</td>
+                    {% elif data_work_val == ' ' or data_work_val == 0  and date_day < date_day_today %}
+                        <td><a style="text-decoration: none;" title='{{ all_dict.familia }}' href="{% url 'createworkday' all_dict.id data_work_id 0 date_day date_month date_year   %}" >_</a></td>
+
+                    {% else %}
+                        <td><a style="text-decoration: none;" title='{{ all_dict.familia }}' href="{% url 'createworkday' all_dict.id data_work_id data_work_val date_day date_month date_year  %}" >{{ data_work_val }}</a></td>
+                    {% endif %}
+
+
+                {% endfor %}
+
+            {% endfor %}
+
+            {% endfor %}
+        <td  class="td_workday">{{ all_dict.dni_sum }}</td>
+<td class="td_workday">{{ all_dict.chasi_sum }}</td>
+        </tr>
+
+{% endfor %}
+{% endwith %}
+{% endwith %}
+{% endwith %}
+    </table>
+    <br>
+ <form method="POST" id="viewAtherMonth"  actions="tabel" enctype="multipart/form-data">
+    {% csrf_token %}
+        {{formEnterDate}}
+ <button type="submit" name="{{ formEnterDate.prefix }}" form="viewAtherMonth" value="viewAtherMonth">ПОСМОТРЕТЬ ДРУГОЙ МЕСЯЦ</button>
+       </form>
+{% endblock %}
+
+ <script src="{% static 'js/script.js' %}"></script>
+{#  {% if data_work.values()=='О' or data_work.values()=='Б' or data_work.values()=='П' or data_work.values()=='Х' %} #}
+{#                   <td><a style="text-decoration: none;" title='{{ all_dict.familia }}' href="{% url 'editOtpusk' data_work.keys() data_work.values()   %}" >{{ data_work.values() }}</a></td> #}
+{#                   {% else %} #}
+{#               <td><a style="text-decoration: none;" title='{{ all_dict.familia }}' href="{% url 'tabeledit' all_dict.id data_work.values() data_day data_month data_year  %}" >{{ data_work.values() }}</a></td> #}
+{#                {% endif %} #}

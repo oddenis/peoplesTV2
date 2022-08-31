@@ -1,0 +1,29 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/stylesheet_new.css'%}" type="text/css">
+
+    <title>Делаем отпуска</title>
+
+{% block content %}
+    <hr class="mt-6 mb-2">
+<ul class="nav nav-pills nav-justified">
+    <li class="nav-item"><a class="nav-link active" aria-current="page" href="{% url 'index' %}">ГЛАВНАЯ</a></li></ul>
+<hr class="mt-6 mb-2">
+    <h3>Создать отпуск сотруднику</h3>
+    <hr class="mt-6 mb-2">
+        <h2>{{ id_people.name }} {{ id_people.familia }}</h2>
+
+<img src="/media/{{ id_people.photo }}" hieght="100" width="75">
+
+    <form method="POST" id='formCreateWorkday' actions="/createotpusk/" enctype="multipart/form-data" style="align-content: center">
+        {% csrf_token %}
+         <table align="center">
+             <caption>Создай смену</caption>
+       <td>{{ workdayform }}</td></tr>
+
+    </table>
+    <input type="submit" name="form_smena" value="Создать" style="align-content: center">
+     </form>
+
+
+
+{% endblock %}

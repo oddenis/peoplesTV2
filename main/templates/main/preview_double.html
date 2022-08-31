@@ -1,0 +1,174 @@
+{% extends 'main/base.html' %}
+
+<title>просмотр карточки</title>
+{% block content %}
+    <style type="text/css">
+    table {
+   width: 100%;
+}
+        .d {
+    display: block;
+    text-align: center;
+   }
+  </style>
+<br>
+<ul class="nav nav-pills nav-justified">
+   <li class="nav-item"> <a class="nav-link active" aria-current="page" href="{% url 'index' %}">ГЛАВНАЯ  </a></li>
+    <li class="nav-item"> <a class="nav-link active" aria-current="page" href="{% url 'createotpusk' id_otpusknik %}">СОЗДАТЬ ОТПУСК  </a></li>
+    <li class="nav-item"> <a class="nav-link active" aria-current="page" href="{% url 'edit' id_otpusknik %}">РЕДАКТИРОВАТЬ  </a></li>
+    <li class="nav-item"> <a class="nav-link active" aria-current="page" href="{% url 'del' id_otpusknik %}">УДАЛИТЬ  </a> </li>
+</ul>
+    <hr class="mt-6 mb-0">
+    <img src="/media/{{ cartochka.photo }}" hieght="200" width="150" class="rounded float-end">
+<h3>{{ cartochka.familia }} {{ cartochka.name }} {{ cartochka.sename }}</h3>
+<h4>{{ cartochka.dolzhnost }}</h4>
+<hr>
+<div>
+    <p class="fw-bolder"><span class="fst-italic fw-normal">Пол:</span>  {{ cartochka.female }}</p>
+    <p class="fw-bold"><span class="fst-italic fw-normal">Дата рождения:</span>  {{ cartochka.dateOfBirth | date:"d.m.Y" }}</p>
+    <p class="fw-bold"><span class="fst-italic fw-normal">Работает с:</span> {{ cartochka.dateStartWork }}</p>
+    <p class="fw-bold"><span class="fst-italic fw-normal">Карточка создана: </span> {{ cartochka.create_at }}</p>
+</div>
+<hr class="mt-6 mb-2">
+<h4>Отпуска</h4>
+    <hr class="mt-6 mb-2">
+
+
+{% for i in otpusk %}
+    <table style="width:1000px">
+    <tr>
+        <td><span class="fst-italic fw-normal" style="font-size: 20px; position: inherit">Тип отпуска: </span> <span class="fw-bold" style="font-size: 20px; position: inherit">{{ i.title_otpusk }}</span></td>
+        <td><a href="{% url 'editOtpusk' i.id i.title_otpusk %}">Редактировать</a></td>
+        <td><a href="{% url 'delOtpusk' i.id %}"> Удалить отпуск</a> </td>
+        <td style="width:100px"><a href="{% url 'watchfoto' i.id i.person_id %}" ><img src="/media/{{ i.zayvlenie }}" hieght="150" width="100" ></a></td>
+        <td style="padding-left: 30px"><a href="">Посмотреть график</a></td>
+    </tr>
+    <tr>
+        <td>Начало отпуска: {{ i.nachOtpusk }}</td>
+    </tr>
+    <tr>
+        <td>Кол-во дней: {{ i.kolvoDney }}</td>
+    </tr>
+    <tr>
+        <td>Выход на работу: {{ i.konecOtpusk }}</td>
+    </tr>
+
+</table>
+
+
+    <br>
+
+
+
+<hr>
+{% endfor %}
+
+
+    <div style="width: 1300px; height: 10px">
+ <div class="row ">
+
+ <div class="col-1" style="text-align: center; border: 2px  solid grey">
+     <span style="font-size: 13px">{{ today|date:"F" }}</span>
+ </div>
+
+    {% for day in daymonth %}
+        {% if day in weekend %}
+            <div class="col-sm" style="text-align: center; border: 2px  solid dimgrey; background: red">
+        {% else %}
+            <div class="col-sm" style="text-align: center; border: 2px  solid dimgrey; background: lightblue">
+        {% endif %}
+     <span style="font-size: 11px"> {{ day }}</span>
+    </div>
+
+    {% endfor %}
+    </div>
+ </div>
+
+ <br>
+    <div style="width: 1300px; ">
+    {% for name, calkey in Kalendar.items %}
+    <div class="row" style="height: 25px;">
+        <div class="col-1" style="text-align: center; height: 60px; border: 2px  solid grey; background: aqua;  font-weight: bold ">
+            <a href="preview/{{ name.id }}" style="font-size: 13px; color: black">{{ name }} </a>
+        </div>
+        {% for day, color_key in calkey.items %}
+            {% if color_key == 'lightgreen' or color_key == 'red'  %}
+                <div class="col-sm" style="text-align: center;  border: 2px  solid dimgrey; background: {{ color_key }}">
+                <span style="font-size: 11px; position: relative; top: 1px; left: 1px;"> {{ day }}</span>
+                </div>
+            {% else %}
+
+                <div class="col-sm" style="text-align: center;  border: 2px  solid dimgrey; background: {% for color in color_key.keys %}{{ color }}{% endfor %}">
+                <span style="font-size: 11px; position: relative; top: 1px; left: 1px;"> {{ day }} </span>
+                    <span title="О-Очередной Б-Больничный Х-без оплаты" style="font-size: 11px; font-weight: bold; position: relative; top: 1px;"> {% for type in color_key.values %} {{ type }} {% endfor %}</span>
+            </div>
+            {% endif %}
+        {% endfor %}
+
+
+        </div>
+        <br>
+
+    {% endfor %}
+</div>
+<hr class="mt-6 mb-2">
+<h4>Табель сотрудника</h4>
+    <hr class="mt-6 mb-2">
+
+
+{% with date_month=view_date|date:"m" %}
+{% with date_year=view_date|date:"Y" %}
+<table>
+
+   <tr>
+    <th style="text-align: center; border: 2px  solid dimgrey; ">{{ today|date:"F" }}</th>
+
+    {% for day in daymonth %}
+        {% if day in weekend %}
+            <th style="text-align: center; border: 2px  solid dimgrey; background: red">
+        {% else %}
+            <th style="text-align: center; border: 2px  solid dimgrey; background: lightblue">
+        {% endif %}
+     <span style="font-size: 11px"> {{ day }}</span>
+       </th>
+     {% endfor %}
+   <th class="tabel-th1">рабдней</th>
+   <th class="tabel-th1">часов</th>
+   </tr>
+
+    {% for all_dict in tabeldata %}
+
+        <tr>
+<td></td>
+            {% for each_dict_k, each_dict_v in all_dict.items %}
+
+            {% for date_day, data_work in each_dict_v.items %}
+                {% for data_work_id,data_work_val in data_work.items %}
+                    {% if data_work_val == 'О' or data_work_val == 'Б' or data_work_val == 'П' or data_work_val == 'Х' %}
+                        <td><a style="text-decoration: none;" title="О-Очередной Б-Больничный Х-без оплаты П-прогул" href="{% url 'editOtpusk' data_work_id data_work_val   %}" >{{ data_work_val }}</a></td>
+                    {% else %}
+                        <td><a style="text-decoration: none;" title="О-Очередной Б-Больничный Х-без оплаты П-прогул" href="{% url 'tabeledit' all_dict.id data_work_val date_day date_month date_year  %}" >{{ data_work_val }}</a></td>
+                    {% endif %}
+
+
+                {% endfor %}
+
+            {% endfor %}
+
+            {% endfor %}
+        <td></td>
+<td>{{ all_dict.chasi_sum }}</td>
+        </tr>
+
+{% endfor %}
+{% endwith %}
+{% endwith %}
+    </table>
+
+{% endblock %}
+{% block proba %}
+
+{% endblock %}
+
+
+  <p class="fw-bold"> <span class="fst-italic fw-normal">

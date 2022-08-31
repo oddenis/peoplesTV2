@@ -1,0 +1,105 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block content %}
+    <title>{{ title_site }}</title>
+    <p>вау</p>
+<h1 class="mt-3 justify-content-center">{{ title_site }}</h1>
+<hr class="mt-6 mb-2">
+
+<ul class="nav nav-pills nav-justified">
+
+    <li class="nav-item"> <a class="nav-link active" aria-current="page" href="{% url 'tabel' %}">ТАБЕЛЬ</a>
+  </li>
+  <li class="nav-item"> <a class="nav-link active" aria-current="page" href="{% url 'createcard' %}">СОЗДАТЬ СОТРУДНИКА</a>
+  </li>
+   <li class="nav-item"> <a class="nav-link active" aria-current="page" href="{% url 'search' %}">ПОИСК КОЛЛЕГИ</a>
+   </li>
+</ul>
+
+   <hr class="mt-6 mb-2">
+<div style="font-size: 20px; font-weight: inherit; ">Сегодня: {% now "l, d M, Y" %} </div>
+<br>
+
+<div style="width: 1300px; height: 10px">
+ <div class="row ">
+
+ <div class="col-1" style="text-align: center; border: 2px  solid grey">
+     <span style="font-size: 13px">{{ today|date:"F" }}</span>
+ </div>
+
+    {% for day in daymonth %}
+        {% if day in weekend %}
+            <div class="col-sm" style="text-align: center; border: 2px  solid dimgrey; background: red">
+        {% else %}
+            <div class="col-sm" style="text-align: center; border: 2px  solid dimgrey; background: lightblue">
+        {% endif %}
+     <span style="font-size: 11px"> {{ day }}</span>
+    </div>
+
+    {% endfor %}
+    </div>
+ </div>
+
+ <br>
+
+<div style="width: 1300px; ">
+    {% for name, calkey in Kalendar.items %}
+    <div class="row" style="height: 25px;">
+        <div class="col-1" style="text-align: center; height: 60px; border: 2px  solid grey; background: aqua;  font-weight: bold ">
+            <a href="preview/{{ name.id }}" style="font-size: 13px; color: black">{{ name }} </a>
+        </div>
+        {% for day, color_key in calkey.items %}
+            {% if color_key == 'lightgreen' or color_key == 'red'  %}
+                <div class="col-sm" style="text-align: center;  border: 2px  solid dimgrey; background: {{ color_key }}">
+                <span style="font-size: 11px; position: relative; top: 1px; left: 1px;"> {{ day }}</span>
+                </div>
+            {% else %}
+
+                <div class="col-sm" style="text-align: center;  border: 2px  solid dimgrey; background: {% for color in color_key.keys %}{{ color }}{% endfor %}">
+                <span style="font-size: 11px; position: relative; top: 1px; left: 1px;"> {{ day }} </span>
+                <span title="О-Очередной Б-Больничный Х-без оплаты" style="font-size: 11px; font-weight: bold; position: relative; top: 1px;"> {% for type in color_key.values %}{{ type }}{% endfor %}</span>
+            </div>
+            {% endif %}
+        {% endfor %}
+
+
+        </div>
+        <br>
+
+    {% endfor %}
+</div>
+
+<br>
+   <form method="POST" id='formData' actions="index" enctype="multipart/form-data">
+    {% csrf_token %}
+        {{dateform}}
+ <button type="submit" value="Сохранить">OK</button>
+       </form>
+ <hr>
+<br>
+<div style="font-size: 20px; font-weight: bold; ">НОВОСТИ КОМПАНИИ </div>
+<hr>
+    <div style="font-size: 20px; font-weight: bold; "><h3>Сегодня день рождения!</h3>
+    <table>
+
+    {% for personBirthday in BirthPeople %}
+         <tr >
+        <td width="250 px", align="center">
+        <img style="background-color: grey" src="/media/{{ personBirthday.photo }}" hieght="200" width="150" >
+        </td>
+        <td width="250 px", align="center",valign="top">{{ personBirthday.name }}
+        {{ personBirthday.familia }}<br>
+            <span style="font-weight: normal">{{ personBirthday.dolzhnost }}</span>
+        </td>
+        <td style="color: red; width: 700px; align: center">Поздравляем!</td>
+        </tr>
+    {% endfor %}
+
+    </table>
+    </div>
+<hr>
+
+
+{% endblock %}
+ <script src="{% static 'js/script.js' %}"></script>

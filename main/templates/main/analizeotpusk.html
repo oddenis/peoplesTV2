@@ -1,0 +1,39 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h3>Есть совпадения по отпускам</h3>
+<div style="width: 1300px; ">
+    {% for name, calkey in Kalendar.items %}
+    <div class="row" style="height: 25px;">
+        <div class="col-1" style="text-align: center; height: 60px; border: 2px  solid grey; background: aqua;  font-weight: bold ">
+            <a href="preview/{{ name.id }}" style="font-size: 13px; color: black">{{ name }} </a>
+        </div>
+        {% for day, color_key in calkey.items %}
+            {% if color_key == 'lightgreen' or color_key == 'red'  %}
+                <div class="col-sm" style="text-align: center;  border: 2px  solid dimgrey; background: {{ color_key }}">
+                <span style="font-size: 11px; position: relative; top: 1px; left: 1px;"> {{ day }}</span>
+                </div>
+            {% else %}
+
+                <div class="col-sm" style="text-align: center;  border: 2px  solid dimgrey; background: {% for color in color_key.keys %}{{ color }}{% endfor %}">
+                <span style="font-size: 11px; position: relative; top: 1px; left: 1px;"> {{ day }} </span>
+                <span title="О-Очередной Б-Больничный Х-без оплаты" style="font-size: 11px; font-weight: bold; position: relative; top: 1px;"> {% for type in color_key.values %}{{ type }}{% endfor %}</span>
+            </div>
+            {% endif %}
+        {% endfor %}
+
+
+        </div>
+        <br>
+    {% endfor %}
+</div>
+{{ addKollegsOtpusk }}
+</body>
+</html>

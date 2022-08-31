@@ -1,0 +1,164 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+
+<!--
+    <span class="d-block p-2 bg-primary text-white" style="text-align: center; size: 30px"><h3>d-block</h3></span>
+<span class="d-block p-2 bg-dark text-white">d-block</span>
+<div class="container">
+<div class="row justify-content-md-center" style="background: aqua">
+
+        {% for k in people %}
+
+                {% if forloop.counter0|divisibleby:10 %}
+                    </div>
+                    <hr>
+                <div class="row justify-content-md-center">
+                <div class="col col-lg-md-1" style="text-align: center; border: 2px solid dimgrey; background: lightgray">
+
+            <img src="/media/{{ k.photo }}"  hieght="200" width="100" style="background: aqua"><br/><hr>
+                 {{ k.name }} {{ k.familia }}<br/>
+                        {{ k.dolzhnost }}<br/>
+
+            </div>
+
+            {% else %}
+                    <div class="col col-lg-md-1 "  style="text-align: center; border: 2px  solid dimgrey; background: lightgray">
+                    <a data-fancybox="gallery" href="/media/{{ k.photo }}">
+                    <img src="/media/{{ k.photo }}" hieght="200" width="100" ></a><br/><hr>
+                     {{ k.name }} {{ k.familia }}<br/>
+                        {{ k.dolzhnost }}<br/>
+
+                  </div>
+            {% endif %}
+
+
+        {% endfor %}
+</div>
+    </div>
+<div class="d-inline p-2 bg-primary text-white">d-inline</div>
+<div class="d-inline p-2 bg-dark text-white">d-inline</div>
+
+-->
+{% endblock %}
+
+
+{% block table %}
+
+<div style="width: 1300px; height: 10px">
+ <div class="row ">
+
+ <div class="col-1" style="text-align: center; border: 2px  solid grey">
+     <span style="font-size: 13px">{{ today|date:"F" }}</span>
+ </div>
+
+    {% for day in daymonth %}
+        {% if day in weekend %}
+            <div class="col-sm" style="text-align: center; border: 2px  solid dimgrey; background: red">
+        {% else %}
+            <div class="col-sm" style="text-align: center; border: 2px  solid dimgrey; background: lightblue">
+        {% endif %}
+     <span style="font-size: 11px"> {{ day }}</span>
+    </div>
+
+    {% endfor %}
+    </div>
+ </div>
+
+ <br>
+<!--
+  <div class="row" style="height: 10px">
+       <div class="col-1" style="text-align: center; border: 2px  solid grey">
+     <span style="font-size: 13px">TypeOfOtpusk</span>
+
+      <div class="col-5">
+          bla-bla
+      </div>
+      <div class="col-sm-auto">Odegov otpusk</div>
+      <div class="col col-lg-2"></div>
+       </div>
+  <br>
+<br>
+-->
+<div style="width: 1300px; ">
+    {% for name, calkey in Kalendar.items %}
+    <div class="row" style="height: 25px;">
+        <div class="col-1" style="text-align: center; height: 60px; border: 2px  solid grey; background: aqua;  font-weight: bold ">
+            <a href="preview/{{ name.id }}" style="font-size: 13px; color: black">{{ name }} </a>
+        </div>
+        {% for day, color_key in calkey.items %}
+            {% if color_key == 'lightgreen' or color_key == 'red'  %}
+                <div class="col-sm" style="text-align: center;  border: 2px  solid dimgrey; background: {{ color_key }}">
+                <span style="font-size: 11px; position: relative; top: 1px; left: 1px;"> {{ day }}</span>
+                </div>
+            {% else %}
+
+                <div class="col-sm" style="text-align: center;  border: 2px  solid dimgrey; background: {% for color in color_key.keys %}{{ color }}{% endfor %}">
+                <span style="font-size: 11px; position: relative; top: 1px; left: 1px;"> {{ day }} </span>
+                <span title="О-Очередной Б-Больничный Х-без оплаты" style="font-size: 11px; font-weight: bold; position: relative; top: 1px;"> {% for type in color_key.values %}{{ type }}{% endfor %}</span>
+            </div>
+            {% endif %}
+        {% endfor %}
+
+
+        </div>
+        <br>
+
+    {% endfor %}
+</div>
+    <br>
+    <br>
+    <br>
+    <br>
+
+{% endblock %}
+
+
+{% block proba %}
+
+ <style type="text/css">
+    tabl {
+        border: 1px solid grey;
+        width: 400px;
+}
+    tr {
+   border: 1px solid grey;
+}
+        .d {
+    display: block;
+    text-align: center;
+   }
+  </style>
+
+
+<tabl>
+    <tr>
+        <td>Тип отпуска: </td>
+        <td><a href="">редактировать</a></td>
+        <td><a href=""> удалить</a> </td>
+        <td><img src="" hieght="150" width="100" ></td>
+    </tr>
+    <tr>
+        <td>Начало отпуска: </td>
+    </tr>
+    <tr>
+        <td>Кол-во дней: </td>
+    </tr>
+    <tr>
+        <td>Выход на работу: </td>
+    </tr>
+
+
+</tabl>
+
+    <form method="POST" actions="/proba/" enctype="multipart/form-data">
+    {% csrf_token %}
+        {{dateform}}
+ <button type="submit" value="Сохранить">OK</button>
+<br>
+
+    <br>
+    {{ formset.as_p }}
+{% endblock %}
+
+
