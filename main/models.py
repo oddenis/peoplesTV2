@@ -76,7 +76,7 @@ class Otpuska(models.Model):
                 ]
 #    person=models.CharField('Фамилия сотрудника', max_length=50, null=True)
     title_otpusk=models.CharField('Тип отпуска', max_length=50, choices=typeOtpusk, null=True )
-    nachOtpusk=models.DateField('Начало отпуска',null=True)
+    nachOtpusk=models.DateField('Начало отпуска', null=True)
     kolvoDney=models.IntegerField('Количество дней', null=True, blank=True )
     konecOtpusk=models.DateField('Конец отпуска', null=True)
     zayvlenie = models.ImageField('заявление(скан)', upload_to='zayvlenie/%m/%d/', blank=True, null=True)

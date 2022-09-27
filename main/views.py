@@ -334,6 +334,12 @@ def createotpusk(request, id_man):
 
     return render(request, 'main/createotpusk.html', context)
 
+def _get_forms(request, formcls, prefix):
+    dataa = request.POST if prefix in request.POST else None
+    print('DATAA', dataa)
+    print('PREFIX', prefix)
+    print('FORMCLS:', type(formcls))
+    return formcls(dataa, prefix=prefix)
 
 class CreateOtpuskView(TemplateView):
      template_name = 'main/createotpusk.html'
@@ -341,16 +347,28 @@ class CreateOtpuskView(TemplateView):
 #         # методом переопределяем context
      def get_context_data(self, **kwargs):
          print("KWARGS:", kwargs)
+         data = {
+             'title_otpusk': 'О',
+
+         }
          context=super(CreateOtpuskView, self).get_context_data(**kwargs)
-         context['otpuskform'] = OtpuskForm(prefix='aform_pre')
+         context['otpuskform'] = OtpuskForm(initial=data, prefix='aform_pre')
          people=Peoples.objects.get(id=self.kwargs['id_man'])
          print('CONTEXT:', context)
          return context
 
      def post(self, request, *args, **kwargs):
-         aform = _get_form(request, OtpuskForm, 'aform_pre')
+         print("KWARGSSS:", kwargs)
+         context = {}
+         context['otpuskform'] = OtpuskForm(prefix='aform_pre')
+         print("OTPUSK:", context)
+         #aform = _get_forms(request, OtpuskForm, 'aform_pre')
+         aform=OtpuskForm(request.POST, prefix='aform_pre')
+         context['aform']=aform
+         print("CONTEXT2:", context)
+         print("ERRORS:", aform['nachOtpusk'].errors)
          print('ID_MAN:', self.kwargs['id_man'])
-         context={}
+
       #   return self.render_to_response(context)
          id_people = Peoples.objects.get(id=self.kwargs['id_man'])
          print('ID_PEOPLE:', id_people)
@@ -417,7 +435,7 @@ class CreateOtpuskView(TemplateView):
              if SovpadeniaIsAble > 0:
                  print('CONTEXT:', context)
                  return render(request, 'main/createotpusk.html', context)
-             #    return HttpResponseRedirect('/createotpusk/'+ str(id_people.id), context)
+                 #return HttpResponseRedirect('/createotpusk/'+ str(id_people.id), context)
              else:
                  print('Zapis v BAZU!')
                 # получаем строчку из базы ЛЮДИ с id=id_man , т.е. тот id который передали через GET, внутри кого мы находимся
