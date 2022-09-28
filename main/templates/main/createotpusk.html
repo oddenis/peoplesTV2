@@ -26,7 +26,7 @@
 
 
         <caption>Создай отпуск</caption>
-     <tr><td>{{ otpuskform.as_p }}</td>
+     <tr><td>{{ aform.as_p }}</td>
     </tr>
         <button class="b_submit" type="submit"  value="create_otpusk">Создать отпуск</button>
 
@@ -67,9 +67,5 @@
     {% endfor %}
 </div>
     <br>
-<form method="POST" id='formCrossOtpusk' actions="/createotpusk/" enctype="multipart/form-data" >
-        {% csrf_token %}
-{{ crossform.as_p }}
-<button class="b_submit" type="submit" name="crossform" value="create_otpusk">Добавить сотрудника, с кем нельзя идти в отпуск вместе</button>
-</form>
+
 {% endblock %}

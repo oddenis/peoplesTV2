@@ -1,5 +1,6 @@
 from datetime import datetime, date, timedelta
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, NON_FIELD_ERRORS
+from django.urls import reverse
 
 from django.views.generic.base import TemplateView
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
@@ -334,45 +335,36 @@ def createotpusk(request, id_man):
 
     return render(request, 'main/createotpusk.html', context)
 
+
+
 def _get_forms(request, formcls, prefix):
     dataa = request.POST if prefix in request.POST else None
-    print('DATAA', dataa)
-    print('PREFIX', prefix)
-    print('FORMCLS:', type(formcls))
     return formcls(dataa, prefix=prefix)
+
+
 
 class CreateOtpuskView(TemplateView):
      template_name = 'main/createotpusk.html'
-#
 #         # методом переопределяем context
      def get_context_data(self, **kwargs):
-         print("KWARGS:", kwargs)
+         id_people = Peoples.objects.get(id=self.kwargs['id_man'])
          data = {
              'title_otpusk': 'О',
 
          }
          context=super(CreateOtpuskView, self).get_context_data(**kwargs)
-         context['otpuskform'] = OtpuskForm(initial=data, prefix='aform_pre')
-         people=Peoples.objects.get(id=self.kwargs['id_man'])
-         print('CONTEXT:', context)
+         context['aform'] = OtpuskForm(initial=data, prefix='aform_pre')
+         context['id_people']=id_people
          return context
 
      def post(self, request, *args, **kwargs):
-         print("KWARGSSS:", kwargs)
          context = {}
-         context['otpuskform'] = OtpuskForm(prefix='aform_pre')
-         print("OTPUSK:", context)
+        # context['otpuskform'] = OtpuskForm(prefix='aform_pre')
          #aform = _get_forms(request, OtpuskForm, 'aform_pre')
          aform=OtpuskForm(request.POST, prefix='aform_pre')
          context['aform']=aform
-         print("CONTEXT2:", context)
-         print("ERRORS:", aform['nachOtpusk'].errors)
-         print('ID_MAN:', self.kwargs['id_man'])
-
-      #   return self.render_to_response(context)
          id_people = Peoples.objects.get(id=self.kwargs['id_man'])
-         print('ID_PEOPLE:', id_people)
-         print('AFORM:', aform)
+
          if aform.is_bound and aform.is_valid():
              new = Otpuska()
              new.title_otpusk = aform["title_otpusk"].value()
@@ -381,15 +373,17 @@ class CreateOtpuskView(TemplateView):
              # преобразовываем str в datetime и в int, складываем и получаем дату окончания отпуска
              new.konecOtpusk = datetime.strptime(new.nachOtpusk, '%Y-%m-%d') + timedelta(days=int(new.kolvoDney))
              new.zayvlenie = aform['zayvlenie'].value()
-             contextPlus = drawKalendar(id_people.id, datetime.strptime(new.nachOtpusk, '%Y-%m-%d'))  # вызываем функцию и дополняем словарь context
+
+             nachOtpusk_date=datetime.strptime(new.nachOtpusk, '%Y-%m-%d') #преобразуем new.nachOtpusk  в datetime
+
+             contextPlus = drawKalendar(id_people.id, nachOtpusk_date)  # вызываем функцию и дополняем словарь context
              context.update(contextPlus)
              SovpadeniaIsAble = 0
              SovpadenieList = []
              for day in range(0, int(new.kolvoDney)):
                  allProgPerson=id_people.programma.all() #получаем все программы сотрудника, которому создаем отпуск из объекта id_people
                  for everyProgPerson in allProgPerson: #перебираем каждую программу и сверяем ее с остальными сотрудниками
-                    print("ПРОГРАММА:", id_people.programma.all())
-                    nextday = datetime.strptime(new.nachOtpusk, '%Y-%m-%d') + timedelta(days=day)
+                    nextday = nachOtpusk_date + timedelta(days=day)
                     qq = Q(person__dolzhnost=id_people.dolzhnost) & Q(person__programma__name_programm=everyProgPerson.name_programm) & Q(nachOtpusk__lte=nextday) & \
                     Q(konecOtpusk__gt=nextday) & (Q(title_otpusk='О') | Q(title_otpusk='Х'))
 
@@ -400,41 +394,36 @@ class CreateOtpuskView(TemplateView):
                              SovpadeniaIsAble = SovpadeniaIsAble + 1
 
                  SovpadenieList = list(set(SovpadenieList))
-#                 print("SovpadeniaList:", SovpadenieList[0].person)
                  for name in SovpadenieList:
-                     contextPlus = drawKalendar(name.person.id, nextday)  # вызываем функцию и дополняем словарь context
-                     context['Kalendar'].update(contextPlus['Kalendar'])
+                     if nextday.month==nachOtpusk_date.month: #если дата(месяц) очередного дня отпуска совпадает с месяцем желаемого начала отпуска, тогда рисуем календарь
+                        contextPlus = drawKalendar(name.person.id, nextday)  # вызываем функцию и дополняем словарь context
+                        context['Kalendar'].update(contextPlus['Kalendar'])
 
-             data = {
-                'title_otpusk': new.title_otpusk,
-                'nachOtpusk': new.nachOtpusk,
-                'kolvoDney': new.kolvoDney,
-                'zayvlenie': new.zayvlenie
-             }
-             
-             otpuskform = OtpuskForm(data, initial=data)
-             print("InitialDATA:", data)
-             print("OTPUSKFORM initial:", otpuskform)
+
              context_other = {
-                #               'daymonth': daymonth,
-                #                'weekend': weekend,
-                'otpuskform': otpuskform,
-                #                'Kalendar': perKalendar,
+              #  'otpuskform': otpuskform,
                 'id_people': id_people,
-                'today': datetime.strptime(new.nachOtpusk, '%Y-%m-%d'),
+                'today': nachOtpusk_date,
                 'message': 'Совпадение!!!'
              }
+             # qqq=Q(nachOtpusk__lte=nachOtpusk_date) & Q(konecOtpusk__gt=nachOtpusk_date)
+             # is_otpusk= Otpuska.objects.filter(qqq)
+             # if is_otpusk.count()>0:
+             #     context_other['message']='У Вас такой отпуск уже есть!'
              for day in range(0, int(new.kolvoDney)):
-                 nextday_date_datetime = datetime.strptime(new.nachOtpusk, '%Y-%m-%d') + timedelta(days=day)
-                 nextday_date_str = nextday_date_datetime.strftime("%d")
-                 nextday_date = int(nextday_date_str)  # nextday.strftime("%d") - из datetime переводим в string?  а затем в int
-                 context['Kalendar'][id_people][nextday_date] = {'lightblue': '?'}
-            # print('CONTEXT:', context['Kalendar'][id_people])
+                 nextday_date_datetime = nachOtpusk_date + timedelta(days=day) #перебираем даты отпуска
+
+                 if nextday_date_datetime.month == nachOtpusk_date.month: # если рассматриваемый месяц равен месяцу начала отпуска, то рисуем календарь
+                     nextday_date_str = nextday_date_datetime.strftime("%d")
+                     nextday_date = int(nextday_date_str)  # nextday.strftime("%d") - из datetime переводим в string?  а затем в int
+                     context['Kalendar'][id_people][nextday_date] = {'lightblue': '?'}
+
             # print('SovpadeniaIsAble:', SovpadeniaIsAble)
              context.update(context_other)
+             print('CONTEXT:', context)
              if SovpadeniaIsAble > 0:
-                 print('CONTEXT:', context)
                  return render(request, 'main/createotpusk.html', context)
+                 #return HttpResponseRedirect (reverse('createotpusk', kwargs={'id_man':id_people.id}))
                  #return HttpResponseRedirect('/createotpusk/'+ str(id_people.id), context)
              else:
                  print('Zapis v BAZU!')
@@ -450,6 +439,7 @@ class CreateOtpuskView(TemplateView):
 
                  return HttpResponseRedirect('/')  # переход на главную страницу
          else:
+             #return render(request, 'main/createotpusk.html', context)
              return HttpResponse('<h1>Че-то не то</h1>')
 
 
