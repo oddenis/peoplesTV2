@@ -123,6 +123,10 @@ class CreateTabelNewDay(forms.Form):
     tabelDateWork=forms.DateField(required=False, widget=DateInput(format='%Y-%m-%d', attrs={'type': 'date'}), label=False)
 
 
+class DeleteTabelDay_Form(forms.Form):
+    deltabelDateWork=forms.DateField(required=False, widget=DateInput(format='%Y-%m-%d', attrs={'type': 'date'}), label=False)
+
+
 
 #class CreateWorkDayForm(forms.Form):
 #    typeWorkday = [(7, '7'),

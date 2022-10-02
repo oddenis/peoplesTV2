@@ -6,7 +6,7 @@ from django.views.generic.base import TemplateView
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render, redirect
 from .models import Peoples, Otpuska, Dolzhnost, Tabel, Proba,  Otdels, Programm, Progconnect
-from .forms import UserForm, OtpuskForm, Search, EditForm, ZayavaForm, DateForm, TabelForm, CreateWorkDayForm, manForm, CreateTabelNewDay, ProbaForm
+from .forms import UserForm, OtpuskForm, Search, EditForm, ZayavaForm, DateForm, TabelForm, CreateWorkDayForm, manForm, CreateTabelNewDay, DeleteTabelDay_Form, ProbaForm
 from django.forms import modelformset_factory, inlineformset_factory
 from django.db.models import Q
 from django.core.exceptions import NON_FIELD_ERRORS
@@ -1146,6 +1146,8 @@ class TabelView(TemplateView):
         context['allPeople']=allPeople
         context['formEnterDate']=DateForm(prefix='aform_pre')
         context['createTabelDay']=CreateTabelNewDay(initial=data, prefix='bform_pre')
+        context['deleteTabelDay']=DeleteTabelDay_Form(initial=data, prefix='cform_pre')
+
 #        print("CONTEXT:", context['createTabelDay'])
         return context
 
@@ -1160,6 +1162,7 @@ class TabelView(TemplateView):
 
         aform = _get_form(request, DateForm, 'aform_pre')
         bform = _get_form(request, CreateTabelNewDay, 'bform_pre')
+        cform = _get_form(request, DeleteTabelDay_Form, 'cform_pre')
         if aform.is_bound and aform.is_valid():
             d = datetime.strptime(aform['date'].value(), "%Y-%m")
 
@@ -1167,6 +1170,11 @@ class TabelView(TemplateView):
             createEnterDay_date = datetime.strptime(bform['tabelDateWork'].value(), "%Y-%m-%d")
             for person in allPeople:
                 writetabel(createEnterDay_date.date(), person)
+        elif cform.is_bound and cform.is_valid():
+            deleteEnterDay_date = datetime.strptime(cform['deltabelDateWork'].value(), "%Y-%m-%d")
+            allworkdays = Tabel.objects.filter(dataTabel=deleteEnterDay_date)
+            for person_day in allworkdays:
+                person_day.delete()
         else:
             return HttpResponse('<h1>Че-то не то</h1>')
             # Process bform and render response
@@ -1174,7 +1182,8 @@ class TabelView(TemplateView):
         context = {
             'formEnterDate': aform,
             'emptyWork': 0,
-            'createTabelDay': bform
+            'createTabelDay': bform,
+            'deleteTabelDay':cform
         }
         context.update(call_tabel)
 

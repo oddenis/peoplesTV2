@@ -24,6 +24,12 @@
     <button type="submit"  name="{{ createTabelDay.prefix }}" form="CreateTabelNewDay_form" value="createTabelNewDay">СОЗДАТЬ РАБОЧИЙ ДЕНЬ</button>
        </form>
 
+<form method="POST" id="DeleteTabelNewDay_form" actions="tabel" enctype="multipart/form-data">
+    {% csrf_token %}
+{{ deleteTabelDay }}
+    <button type="submit"  name="{{ deleteTabelDay.prefix }}" form="DeleteTabelNewDay_form" value="deleteTabelDay_Form">УДАЛИТЬ РАБОЧИЙ ДЕНЬ</button>
+       </form>
+
 
 {% with date_day_today=view_date|date:"d" %}
 {% with date_month=view_date|date:"m" %}
